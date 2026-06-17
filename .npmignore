@@ -1,0 +1,4 @@
+tests/
+.pi/
+reespec/
+*.test.mjs

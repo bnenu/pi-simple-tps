@@ -1,0 +1,18 @@
+{
+  "name": "pi-simple-tps",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Real-time TPS (tokens per second) VU meter for the pi TUI",
+  "main": "extensions/tps-meter.js",
+  "license": "MIT",
+  "keywords": [
+    "pi-extension",
+    "tps",
+    "tokens-per-second",
+    "vu-meter",
+    "tui"
+  ],
+  "pi": {
+    "extension": "extensions/tps-meter.js"
+  }
+}
