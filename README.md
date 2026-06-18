@@ -47,4 +47,4 @@ MIT
 
 ---
 
-Made with reespec and ❤️ in EU
+Made with reespec and ❤️in EU
