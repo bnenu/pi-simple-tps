@@ -1,59 +1,6 @@
 import { computeTps } from "../src/tps-calc.js";
 import { computeDecayedTps } from "../src/idle-decay.js";
-
-// Strip ANSI escape sequences to get visible character width
-function visibleWidth(str) {
-  return str.replace(/\x1b\[[0-9;]*m/g, "").length;
-}
-
-// Truncate string to visible width, accounting for ANSI color codes
-function truncateToWidth(str, maxWidth, ellipsis = "…") {
-  const plain = str.replace(/\x1b\[[0-9;]*m/g, "");
-  if (plain.length <= maxWidth) return str;
-  // Count visible chars we can fit
-  let visCount = 0;
-  let inEsc = false;
-  let result = "";
-  for (let i = 0; i < str.length && visCount < maxWidth; i++) {
-    const ch = str[i];
-    if (ch === "\x1b") { inEsc = true; result += ch; continue; }
-    if (inEsc) {
-      result += ch;
-      if (ch === "m") inEsc = false;
-      continue;
-    }
-    result += ch;
-    visCount++;
-  }
-  return result + (visCount >= maxWidth ? "" : ellipsis);
-}
-
-const FILLED_BAR  = "█"; // U+2588 full block
-const GRADIENT_TIP = "▓";  // U+2593 dark shade (gradient tip)
-const EMPTY_BAR   = "░";  // U+2591 light shade
-const TOTAL_BARS = 20;
-const TPS_PER_BAR = 5;
-const GREEN_MAX = 50;
-const YELLOW_MAX = 80;
-
-function barColor(barIndex) {
-  const tpsForBar = (barIndex + 1) * TPS_PER_BAR;
-  if (tpsForBar <= GREEN_MAX) return "success";
-  if (tpsForBar <= YELLOW_MAX) return "warning";
-  return "error";
-}
-
-// Apply color with ANSI fallback if theme doesn't have the color
-function coloredBar(theme, colorKey, char) {
-  const colored = theme.fg(colorKey, char);
-  // If theme.fg returns uncolored text (fallback), use direct ANSI codes
-  if (colored === char) {
-    if (colorKey === "success") return "\x1b[32m" + char + "\x1b[0m";
-    if (colorKey === "warning") return "\x1b[33m" + char + "\x1b[0m";
-    if (colorKey === "error") return "\x1b[31m" + char + "\x1b[0m";
-  }
-  return colored;
-}
+import { renderMeterWithTheme } from "../src/render.js";
 
 /**
  * Build a widget component that renders a TPS VU meter.
@@ -63,23 +10,8 @@ function createMeterComponent(getTpsFn, theme) {
   return {
     render(width) {
       const tps = Math.min(Math.max(getTpsFn(), 0), 100);
-      const filledBars = Math.min(Math.floor(tps / TPS_PER_BAR), TOTAL_BARS);
-      const emptyBars = TOTAL_BARS - filledBars;
-
-      let bars = "";
-      for (let i = 0; i < filledBars; i++) {
-        // Use gradient tip (▓) for the last filled bar, full block (█) for others
-        const char = (i === filledBars - 1 && filledBars > 0) ? GRADIENT_TIP : FILLED_BAR;
-        bars += coloredBar(theme, barColor(i), char);
-      }
-      bars += EMPTY_BAR.repeat(emptyBars);
-
-      // ⚡ first, then label, then bars — use visibleWidth + truncateToWidth for ANSI safety
-      const label = `${Math.round(tps)} t/s`;
-      const line = `⚡ ${label} ${bars}`;
-
-      // Truncate to visible width so ANSI color codes don't cause overflow
-      return [truncateToWidth(line, width)];
+      const line = renderMeterWithTheme(tps, theme);
+      return [line];
     },
 
     invalidate() {
