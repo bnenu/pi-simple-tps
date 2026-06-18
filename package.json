@@ -1,6 +1,6 @@
 {
   "name": "pi-simple-tps",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Real-time TPS (tokens per second) VU meter for the pi TUI",
   "main": "extensions/tps-meter.js",
