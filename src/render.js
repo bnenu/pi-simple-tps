@@ -6,8 +6,8 @@ const TOTAL_BARS = 20;
 const TPS_PER_BAR = 5;
 
 // Color zone thresholds
-const GREEN_MAX = 50;
-const YELLOW_MAX = 80;
+const RED_MAX = 15;
+const YELLOW_MAX = 40;
 
 /**
  * Determine the theme color key for a given bar index (0-based).
@@ -17,12 +17,12 @@ const YELLOW_MAX = 80;
  */
 function barColor(barIndex) {
   const tpsForBar = (barIndex + 1) * TPS_PER_BAR; // TPS at the top of this bar
-  if (tpsForBar <= GREEN_MAX) {
-    return "success";
+  if (tpsForBar <= RED_MAX) {
+    return "error";
   } else if (tpsForBar <= YELLOW_MAX) {
     return "warning";
   }
-  return "error";
+  return "success";
 }
 
 /**

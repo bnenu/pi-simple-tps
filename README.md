@@ -3,16 +3,16 @@
 A pi TUI extension that displays a real-time **tokens per second (TPS)** meter as a visual VU bar chart. Watch your model's generation speed at a glance while the agent streams a response.
 
 ```
-⚡ 85 t/s ▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮
+⚡ 85 t/s ████████████████████
 ```
 
 ## Features
 
 - **Real-time TPS display** — Shows tokens per second as a 20-bar VU meter
 - **Gradient fill** — `░` (empty), `▓` (tip), `█` (filled) for clear visual distinction
-- **Color-coded zones** — Green (0–50 t/s), Yellow (51–80 t/s), Red (81–100+ t/s)
+- **Color-coded zones** — Red (0–14 t/s), Yellow (15–40 t/s), Green (41+ t/s)
 - **Idle decay** — Peak TPS holds for 10 seconds, then smoothly decays to zero
-- **Theme-aware** — Uses your theme's success/warning/error colors
+- **Theme-aware** — Uses your theme's red/yellow/green colors
 - **Default placement** — Renders above the editor for maximum horizontal space
 
 ## Installation
@@ -29,9 +29,9 @@ The TPS meter appears automatically when the agent starts streaming a response. 
 
 | TPS range | Color |
 |-----------|-------|
-| 0–50 t/s  | Green (success) |
-| 51–80 t/s | Yellow (warning) |
-| 81–100+ t/s | Red (error) |
+| Below 15 t/s  | 🔴 Red |
+| 15–40 t/s | 🟡 Yellow |
+| Above 40 t/s | 🟢 Green |
 
 ### Behavior
 
@@ -40,19 +40,6 @@ The TPS meter appears automatically when the agent starts streaming a response. 
 - After streaming ends, the meter holds the peak value for ~10 seconds
 - The meter decays to zero over ~2 seconds after the hold period
 - The meter persists at zero when the agent session ends
-
-## Architecture
-
-The extension listens for pi TUI events:
-
-| Event | Action |
-|-------|--------|
-| `agent_start` | Reset all state |
-| `session_start` | Register widget |
-| `message_start` | Record start time |
-| `message_update` | Compute TPS, update display |
-| `message_end` | Stop streaming, begin decay |
-| `agent_end` | Reset state, widget persists at 0 |
 
 ## License
 
